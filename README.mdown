@@ -1,0 +1,20 @@
+### AtlasTool.py
+
+AtlasTool.py is a tool for creating texture atlases for use in OpenGL. It uses Pygame
+(SDL) to render individual images into a single large texture, and outputs a texture atlas
+indicating the position and size of each image within the resulting image. 
+
+#### Usage
+
+	python AtlasTool.py [options]
+
+	Options:
+	  -h, --help            show this help message and exit
+	  -d DIR, --dir=DIR     (REQUIRED) Path to a directory containing desired
+	                        texture images.
+	  -s SURFACE_SIZE, --surface=SURFACE_SIZE
+	                        Size of the surface into which to render, of the form
+	                        WIDTHxHEIGHT). Defaults to 512x512.
+	  -o OUTPUT, --output=OUTPUT
+	                        Filename to use when saving the texture and atlas.
+	                        Defaults to 'texture'
