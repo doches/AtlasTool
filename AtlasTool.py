@@ -7,10 +7,13 @@ from optparse import OptionParser
 
 parser = OptionParser(usage="AtlasTool is a utility for packing multiple images into a single OpenGL texture (a texture atlas).\n\nAtlasTool %prog [options]")
 parser.add_option("-d","--dir",dest="dir",help="(REQUIRED) Path to a directory containing desired texture images.")
-parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT). Defaults to 512x512.",default="512x512")
+parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT. Defaults to 512x512.",default="512x512")
 parser.add_option("-o","--output",dest="output",help="Filename to use when saving the texture & atlas. Defaults to 'texture'",default="texture")
+parser.add_option("-f","--fill",dest="debug",help="Fill individual rectangles on use for debugging.",default=False,action="store_true")
 
 (options,parser) = parser.parse_args()
+
+print options
 
 import pygame
 from pygame.locals import *
@@ -34,6 +37,7 @@ class Packing:
     rects = []
     sorted = [[x[0]*x[1],x] for x in list]
     sorted.sort()
+    print sorted
     for pair in sorted:
       rects.append( Rectangle(0,0,pair[1][0],pair[1][1],pair[1][2]) )
     available = [Rectangle(0,0,width,height)]
@@ -42,11 +46,11 @@ class Packing:
     
     while len(rects) > 0:
       rect = rects.pop()
-      smallest = available[0].size()
-      best = available[0]
+      smallest = 0
+      best = None
       for candidate in available:
-        if candidate.w > rect.w and candidate.h > rect.h:
-          if smallest == -1 or candidate.size() < smallest:
+        if candidate.w >= rect.w and candidate.h >= rect.h:
+          if best == None or candidate.size() < smallest:
             smallest = candidate.size()
             best = candidate
       if best != None:
@@ -86,8 +90,11 @@ for key in images:
   if key in packing:
     rect = packing[key]
     image = images[key]
-    c = random.randint(0,255)
-#    pygame.draw.rect(surf,(c,c,c,20),pygame.Rect(rect.x,rect.y,rect.w,rect.h))
+    if options.debug:
+      r = random.randint(0,255)
+      g = random.randint(0,255)
+      b = random.randint(0,255)
+      pygame.draw.rect(surf,(r,g,b,255),pygame.Rect(rect.x,rect.y,rect.w,rect.h))
     surf.blit(image,(rect.x,rect.y))
     fout.write( file + "\t" + str(rect.x) + "\t" + str(rect.y) + "\t" + str(image.get_width()) + "\t" + str(image.get_height()) + "\n" )
 pygame.image.save(surf,image_filename)
