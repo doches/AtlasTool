@@ -37,7 +37,6 @@ class Packing:
     rects = []
     sorted = [[x[0]*x[1],x] for x in list]
     sorted.sort()
-    print sorted
     for pair in sorted:
       rects.append( Rectangle(0,0,pair[1][0],pair[1][1],pair[1][2]) )
     available = [Rectangle(0,0,width,height)]
