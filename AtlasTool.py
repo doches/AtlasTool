@@ -10,10 +10,15 @@ parser.add_option("-d","--dir",dest="dir",help="(REQUIRED) Path to a directory c
 parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT. Defaults to 512x512.",default="512x512")
 parser.add_option("-o","--output",dest="output",help="Filename to use when saving the texture & atlas. Defaults to 'texture'",default="texture")
 parser.add_option("-f","--fill",dest="debug",help="Fill individual rectangles on use for debugging.",default=False,action="store_true")
+parser.add_option("-n","--no-spacing",dest="spacing",help="Do not add a 1-pixel space around all bounding boxes",default=False,action="store_true")
 
 (options,parser) = parser.parse_args()
 
 print options
+if options.spacing:
+	options.spacing = 0
+else:
+	options.spacing = 1
 
 import pygame
 from pygame.locals import *
@@ -77,9 +82,9 @@ files = os.listdir(directory)
 images = {}
 rects = []
 for file in files:
-  if re.search(r"(jpg|jpeg|png|gif|bmp|pcx|tga|tif|lbm|pbm|pgm|ppm|xpm)$",file):
+  if re.search(r"(jpg|jpeg|png|gif|bmp|pcx|tga|lbm|pbm|pgm|ppm|xpm)$",file):
     image = pygame.image.load(os.path.join(directory,file))
-    rects.append( [image.get_width(),image.get_height(),file])
+    rects.append( [image.get_width()+options.spacing,image.get_height()+options.spacing,file])
     images[file] = image
 
 packing = Packing(surfsize[0],surfsize[1],rects).assignments
