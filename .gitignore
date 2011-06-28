@@ -1,0 +1,6 @@
+*.png
+*.atlas
+*~
+.DS_Store
+*.pxi
+*.esproj/
