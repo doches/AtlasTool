@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 parser = OptionParser(usage="AtlasTool is a utility for packing multiple images into a single OpenGL texture (a texture atlas).\n\nAtlasTool %prog [options]")
 parser.add_option("-d","--dir",dest="dir",help="(REQUIRED) Path to a directory containing desired texture images.")
-parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT. Defaults to 512x512.",default="512x512")
+parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT. Defaults to 1024x1024.",default="1024x1024")
 parser.add_option("-o","--output",dest="output",help="Filename to use when saving the texture & atlas. Defaults to 'texture'",default="texture")
 parser.add_option("-f","--fill",dest="debug",help="Fill individual rectangles on use for debugging.",default=False,action="store_true")
 parser.add_option("-n","--no-spacing",dest="spacing",help="Do not add a 1-pixel space around all bounding boxes",default=False,action="store_true")
