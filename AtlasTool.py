@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 parser = OptionParser(usage="AtlasTool is a utility for packing multiple images into a single OpenGL texture (a texture atlas).\n\nAtlasTool %prog [options]")
 parser.add_option("-d","--dir",dest="dir",help="(REQUIRED) Path to a directory containing desired texture images.")
-parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT. Defaults to 1024x1024.",default="1024x1024")
+parser.add_option("-s","--surface",dest="surface_size",help="Size of the surface into which to render, of the form WIDTHxHEIGHT.",default="0x0")
 parser.add_option("-o","--output",dest="output",help="Filename to use when saving the texture & atlas. Defaults to 'texture'",default="texture")
 parser.add_option("-f","--fill",dest="debug",help="Fill individual rectangles on use for debugging.",default=False,action="store_true")
 parser.add_option("-n","--no-spacing",dest="spacing",help="Do not add a 1-pixel space around all bounding boxes",default=False,action="store_true")
@@ -47,6 +47,7 @@ class Packing:
     available = [Rectangle(0,0,width,height)]
     
     self.assignments = {}
+    self.valid = True
     
     while len(rects) > 0:
       rect = rects.pop()
@@ -65,19 +66,16 @@ class Packing:
                       Rectangle(best.x+rect.w,best.y,best.w-rect.w,rect.h)]:
           available.append(child)
       else:
-        print "Could not fit",rect.id
+        print "Could not fit " + str(rect.id) + " in " + str(width) + "x" + str(height)
+        self.valid = False
+        break
 
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption("AtlasTool")
 pygame.init()
 
-image_filename = options.output + ".png"
-atlas_filename = options.output + ".atlas"
 directory = options.dir
-surfsize = options.surface_size.split("x")
-surfsize = (int(surfsize[0]),int(surfsize[1]))
 
-surf = pygame.surface.Surface(surfsize,SRCALPHA)
 files = os.listdir(directory)
 images = {}
 rects = []
@@ -87,8 +85,31 @@ for file in files:
     rects.append( [image.get_width()+options.spacing,image.get_height()+options.spacing,file])
     images[file] = image
 
-packing = Packing(surfsize[0],surfsize[1],rects).assignments
+valid_sizes = [(256,256),(512,256),(512,512),(1024,512),(1024,1024),(2048,1024),(2048,2048)]
+size_index = 0
+
+image_filename = options.output + ".png"
+atlas_filename = options.output + ".atlas"
+packing = False
+if (options.surface_size != "0x0"):
+	surfsize = options.surface_size.split("x")
+	surfsize = (int(surfsize[0]),int(surfsize[1]))
+	packing = Packing(surfsize[0],surfsize[1],rects).assignments
+else:
+	surfsize = valid_sizes[size_index]
+	packing = Packing(surfsize[0],surfsize[1],rects)
+	while packing.valid != True:
+		size_index += 1
+		surfsize = valid_sizes[size_index]
+		packing = Packing(surfsize[0],surfsize[1],rects)
+	packing = packing.assignments
+	print "Packing into " + str(valid_sizes[size_index][0]) + "x" + str(valid_sizes[size_index][1])
+
+surf = pygame.surface.Surface(surfsize,SRCALPHA)
+
 fout = open(atlas_filename,"w")
+# Save texture size as special 'resolution' key
+fout.write("resolution\t0\t0\t" + str(surfsize[0]) + "\t" + str(surfsize[1]) + "\n")
 for key in images:
   file = key[0:key.rindex(".")]
   if key in packing:
