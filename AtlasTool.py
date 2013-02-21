@@ -85,7 +85,7 @@ for file in files:
     rects.append( [image.get_width()+options.spacing,image.get_height()+options.spacing,file])
     images[file] = image
 
-valid_sizes = [(256,256),(512,256),(512,512),(1024,512),(1024,1024),(2048,1024),(2048,2048)]
+valid_sizes = [(256,256),(512,256),(512,512),(1024,512),(1024,1024),(2048,1024),(1024,2048),(2048,2048)]
 size_index = 0
 
 image_filename = options.output + ".png"
